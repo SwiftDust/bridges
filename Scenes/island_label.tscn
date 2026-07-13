@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://da8p6lroo2w41"]
+
+[ext_resource type="FontFile" uid="uid://xkdscj3f4vgm" path="res://Fonts/GoogleSans-VariableFont_GRAD,opsz,wght.ttf" id="1_inmx7"]
+
+[sub_resource type="FontVariation" id="FontVariation_e03ek"]
+base_font = ExtResource("1_inmx7")
+variation_opentype = {
+1196572996: 0,
+1869640570: 18,
+2003265652: 500
+}
+
+[node name="IslandLabel" type="Label" unique_id=1205716485]
+offset_right = 13.0
+offset_bottom = 23.0
+theme_override_fonts/font = SubResource("FontVariation_e03ek")
+theme_override_font_sizes/font_size = 34
+text = "0"
