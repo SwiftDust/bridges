@@ -1,6 +1,5 @@
 extends Node2D
 
-
 @onready var tile_map = $TileMapLayer
 
 var level_arr: PackedStringArray = []
@@ -14,6 +13,7 @@ func _ready() -> void:
 	
 	
 	tile_map.draw_map(level_arr)
+
 
 func _process(delta: float) -> void:
 	pass
