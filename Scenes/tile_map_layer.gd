@@ -1,26 +1,35 @@
 extends TileMapLayer
 
+signal map_changed(idx: int, new_value: String)
+
 @export var label_scene: PackedScene
+@export var bridge_scene: PackedScene
 @export var GRID_SIZE_X = 9
 @export var GRID_SIZE_Y = 5
 
 var label: Node
+var current_map: PackedStringArray = []
 var currently_selected: bool = false
 var currently_selected_pos: Vector2i
 var currently_hovered_pos: Vector2i = Vector2i(-1, -1)
 var is_selected: bool
 var is_unselected: bool
+var is_hovering: bool
 enum tile_type {
 	Sea = 0,
 	UnselectedIsland = 1,
-	BridgeXIslandL = 2,
-	BridgeXIslandR = 3,
-	BridgeX = 4,
-	BridgeY = 5,
-	BridgeYIslandU = 6,
-	BridgeYIslandD = 7,
 	SelectedIsland = 8,
 }
+enum solution_bridge_index { 
+	SingleBridgeX = -1,
+	DoubleBridgeX = -2,
+	SingleBridgeY = -3,
+	DoubleBridgeY = -4,
+} # according to `hashiwokakero` documentation
+
+
+func _ready() -> void:
+	current_map.resize(GRID_SIZE_X * GRID_SIZE_Y)
 
 
 func is_first_island_in_direction(from_pos: Vector2i, to_pos: Vector2i):
@@ -42,33 +51,15 @@ func is_first_island_in_direction(from_pos: Vector2i, to_pos: Vector2i):
 
 
 func draw_bridges_in_direction(from_pos: Vector2i, to_pos: Vector2i):
-	var step_x = sign(to_pos.x - from_pos.x)
-	var step_y = sign(to_pos.y - from_pos.y)
-	var direction = Vector2i(step_x, step_y)
+	var bridge = bridge_scene.instantiate()
+	add_child(bridge)
 	
-	var draw_pos = from_pos + direction
+	var start_pixel = map_to_local(from_pos)
+	var end_pixel = map_to_local(to_pos)
 	
-	if step_x == 0: # moves vertically, so should use Y variant of bridges
-		var first_tile = tile_type.BridgeYIslandD if step_y > 0\
-				else tile_type.BridgeYIslandU
-		var last_tile = tile_type.BridgeYIslandU if step_y > 0\
-				else tile_type.BridgeYIslandD
-		set_cell(draw_pos, first_tile, Vector2i(0, 0), 0)
-		set_cell(draw_pos, last_tile, Vector2i(0, 0), 0)
-		
-		while draw_pos.y + 1 != to_pos.y - 1:
-			set_cell(draw_pos, tile_type.BridgeY, Vector2i(0, 0), 0)
-	else: # moves horizontally
-		var first_tile = tile_type.BridgeXIslandL if step_y > 0\
-				else tile_type.BridgeXIslandR
-		var last_tile = tile_type.BridgeXIslandR if step_y > 0\
-				else tile_type.BridgeXIslandL
-		set_cell(draw_pos, first_tile, Vector2i(0, 0), 0)
-		set_cell(draw_pos, last_tile, Vector2i(0, 0), 0)
-		
-		while draw_pos.x + 1 != to_pos.x - 1:
-			set_cell(draw_pos, tile_type.BridgeX, Vector2i(0, 0), 0)
-	
+	bridge.clear_points();
+	bridge.add_point(start_pixel)
+	bridge.add_point(end_pixel)
 
 
 func draw_map(islands: Array):
@@ -89,12 +80,17 @@ func draw_map(islands: Array):
 
 func _unhandled_input(event: InputEvent) -> void:
 	# TODO: Have a hovered version of tile, too, instead of instantly selecting
-	if event is InputEventMouseButton:
-		var mouse_pos = local_to_map(event.position)
+	if event is InputEventMouseButton and event.pressed:
+		var mouse_pos = local_to_map(get_local_mouse_position())
 		is_unselected = get_cell_source_id(mouse_pos) == tile_type.UnselectedIsland
 		is_selected = get_cell_source_id(mouse_pos) == tile_type.SelectedIsland
 		
-		if event.pressed and (is_unselected or is_selected):
+		if is_hovering and (is_unselected or is_selected):
+			draw_bridges_in_direction(currently_selected_pos, mouse_pos)
+			is_hovering = false
+			currently_selected = false
+			currently_hovered_pos = Vector2i(-1, -1)
+		elif is_unselected or is_selected:
 			if !currently_selected:
 				set_cell(mouse_pos, tile_type.SelectedIsland, Vector2i(0, 0), 0)
 				currently_selected = true
@@ -102,9 +98,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			elif currently_selected_pos == mouse_pos:
 				currently_selected = false
 				set_cell(mouse_pos, tile_type.UnselectedIsland, Vector2i(0, 0), 0)
-				
+		
 	if event is InputEventMouseMotion:
-		var mouse_pos = local_to_map(event.position)
+		var mouse_pos = local_to_map(get_local_mouse_position())
 		var can_be_selected = false
 		
 		if mouse_pos != currently_hovered_pos:
@@ -126,6 +122,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				if can_be_selected and is_first_island_in_direction(currently_selected_pos, mouse_pos):
 					set_cell(mouse_pos, tile_type.SelectedIsland, Vector2i(0, 0), 0)
 					currently_hovered_pos = mouse_pos
+					is_hovering = true
 			else:
 				currently_hovered_pos = Vector2i(-1, -1)
 			

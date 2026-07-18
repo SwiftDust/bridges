@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://duy0k4uiwxdgy"]
+
+[ext_resource type="Texture2D" uid="uid://blufvfre2t6sf" path="res://Sprites/bridge.png" id="1_3mp33"]
+
+[node name="Line2D" type="Line2D" unique_id=2118434994]
+texture_repeat = 2
+points = PackedVector2Array(0, 0)
+texture = ExtResource("1_3mp33")
+texture_mode = 1
