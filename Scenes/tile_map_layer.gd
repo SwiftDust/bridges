@@ -1,6 +1,6 @@
 extends TileMapLayer
 
-signal map_changed(idx: int, new_value: String)
+signal map_changed(new_value: PackedStringArray)
 
 @export var label_scene: PackedScene
 @export var bridge_scene: PackedScene
@@ -32,6 +32,10 @@ func _ready() -> void:
 	current_map.resize(GRID_SIZE_X * GRID_SIZE_Y)
 
 
+func _coords_to_index(pos: Vector2i) -> int:
+	return pos.x * GRID_SIZE_Y + pos.y
+
+
 func is_first_island_in_direction(from_pos: Vector2i, to_pos: Vector2i):
 	var step_x = sign(to_pos.x - from_pos.x)
 	var step_y = sign(to_pos.y - from_pos.y)
@@ -45,12 +49,37 @@ func is_first_island_in_direction(from_pos: Vector2i, to_pos: Vector2i):
 		if cell_id == tile_type.UnselectedIsland or cell_id == tile_type.SelectedIsland:
 			return false
 		
+		var idx = _coords_to_index(check_pos)
+		if idx >= 0 and idx < current_map.size():
+			var value = current_map[idx]
+			if value != "0" and value.to_int() < 0:
+				return false # bridge exists already
+		
 		check_pos += direction
 	
 	return true
 
 
 func draw_bridges_in_direction(from_pos: Vector2i, to_pos: Vector2i):
+	var bridge_value: String
+	if from_pos.y == to_pos.y:
+		bridge_value = str(solution_bridge_index.SingleBridgeX)
+	else:
+		bridge_value = str(solution_bridge_index.SingleBridgeY)
+	
+	var step_x = sign(to_pos.x - from_pos.x)
+	var step_y = sign(to_pos.y - from_pos.y)
+	var direction = Vector2i(step_x, step_y)
+	
+	var draw_pos = from_pos + direction
+	while draw_pos != to_pos:
+		var idx = _coords_to_index(draw_pos)
+		if idx >= 0 and idx < current_map.size():
+			current_map[idx] = bridge_value
+		draw_pos += direction
+	
+	map_changed.emit(current_map)
+	
 	var bridge = bridge_scene.instantiate()
 	add_child(bridge)
 	
@@ -87,6 +116,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 		if is_hovering and (is_unselected or is_selected):
 			draw_bridges_in_direction(currently_selected_pos, mouse_pos)
+			
+			set_cell(currently_selected_pos, tile_type.UnselectedIsland, Vector2i(0, 0), 0)
+			set_cell(mouse_pos, tile_type.UnselectedIsland, Vector2i(0, 0), 0)
+			
 			is_hovering = false
 			currently_selected = false
 			currently_hovered_pos = Vector2i(-1, -1)
