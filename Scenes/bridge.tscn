@@ -1,9 +1,14 @@
 [gd_scene format=3 uid="uid://duy0k4uiwxdgy"]
 
 [ext_resource type="Texture2D" uid="uid://blufvfre2t6sf" path="res://Sprites/bridge.png" id="1_3mp33"]
+[ext_resource type="Script" uid="uid://dih6vry7tf2sm" path="res://Scenes/bridge.gd" id="2_h1rw7"]
+[ext_resource type="Texture2D" uid="uid://b80u1ox7rvand" path="res://Sprites/double-bridge.png" id="3_jy1u5"]
 
 [node name="Line2D" type="Line2D" unique_id=2118434994]
 texture_repeat = 2
 points = PackedVector2Array(0, 0)
-texture = ExtResource("1_3mp33")
+width = 20.0
 texture_mode = 1
+script = ExtResource("2_h1rw7")
+bridge_texture = ExtResource("1_3mp33")
+double_bridge_texture = ExtResource("3_jy1u5")

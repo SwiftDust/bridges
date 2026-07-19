@@ -15,6 +15,7 @@ var currently_hovered_pos: Vector2i = Vector2i(-1, -1)
 var is_selected: bool
 var is_unselected: bool
 var is_hovering: bool
+var visual_bridges: Dictionary = {}
 enum tile_type {
 	Sea = 0,
 	UnselectedIsland = 1,
@@ -36,6 +37,10 @@ func _coords_to_index(pos: Vector2i) -> int:
 	return pos.x * GRID_SIZE_Y + pos.y
 
 
+func _get_path_key(idx1: int, idx2: int) -> String:
+	return str(min(idx1, idx2)) + "-" + str(max(idx1, idx2))
+
+
 func is_first_island_in_direction(from_pos: Vector2i, to_pos: Vector2i):
 	var step_x = sign(to_pos.x - from_pos.x)
 	var step_y = sign(to_pos.y - from_pos.y)
@@ -49,52 +54,73 @@ func is_first_island_in_direction(from_pos: Vector2i, to_pos: Vector2i):
 		if cell_id == tile_type.UnselectedIsland or cell_id == tile_type.SelectedIsland:
 			return false
 		
-		var idx = _coords_to_index(check_pos)
-		if idx >= 0 and idx < current_map.size():
-			var value = current_map[idx]
-			if value != "0" and value.to_int() < 0:
-				return false # bridge exists already
-		
 		check_pos += direction
 	
 	return true
 
 
 func draw_bridges_in_direction(from_pos: Vector2i, to_pos: Vector2i):
-	var bridge_value: String
-	if from_pos.y == to_pos.y:
-		bridge_value = str(solution_bridge_index.SingleBridgeX)
-	else:
-		bridge_value = str(solution_bridge_index.SingleBridgeY)
+	var start_idx = _coords_to_index(from_pos)
+	var end_idx = _coords_to_index(to_pos)
+	var path_key = _get_path_key(start_idx, end_idx)
 	
 	var step_x = sign(to_pos.x - from_pos.x)
 	var step_y = sign(to_pos.y - from_pos.y)
 	var direction = Vector2i(step_x, step_y)
 	
+	var sample_pos = from_pos + direction
+	var sample_idx = _coords_to_index(sample_pos)
+	var current_val = current_map[sample_idx].to_int()
+	
+	var is_horizontal = (from_pos.y == to_pos.y)
+	var next_state_str: String = "0"
+	var action: String = "create" # "create", "upgrade", or "erase"
+	
+	# on every action it cycles from single bridge to double bridge to sea and back
+	if current_val == 0:
+		next_state_str = str(solution_bridge_index.SingleBridgeX if is_horizontal else solution_bridge_index.SingleBridgeY)
+		action = "create"
+	elif current_val == solution_bridge_index.SingleBridgeX or current_val == solution_bridge_index.SingleBridgeY:
+		next_state_str = str(solution_bridge_index.DoubleBridgeX if is_horizontal else solution_bridge_index.DoubleBridgeY)
+		action = "upgrade"
+	else:
+		next_state_str = "0"
+		action = "erase"
+	
 	var draw_pos = from_pos + direction
 	while draw_pos != to_pos:
 		var idx = _coords_to_index(draw_pos)
-		if idx >= 0 and idx < current_map.size():
-			current_map[idx] = bridge_value
+		current_map[idx] = next_state_str
 		draw_pos += direction
 	
-	map_changed.emit(current_map)
-	
-	var bridge = bridge_scene.instantiate()
-	add_child(bridge)
-	
-	var start_pixel = map_to_local(from_pos)
-	var end_pixel = map_to_local(to_pos)
-	if from_pos.x == to_pos.x:
-		start_pixel.y += 20
-		end_pixel.y -= 20
-	if from_pos.y == to_pos.y:
-		start_pixel.x += 20
-		end_pixel.x -= 20
-	
-	bridge.clear_points();
-	bridge.add_point(start_pixel)
-	bridge.add_point(end_pixel)
+	if action == "erase":
+		if visual_bridges.has(path_key):
+			visual_bridges[path_key].queue_free()
+			visual_bridges.erase(path_key)
+	elif action == "create":
+		var bridge = bridge_scene.instantiate()
+		add_child(bridge)
+		
+		var start_pixel = map_to_local(from_pos)
+		var end_pixel = map_to_local(to_pos)
+		
+		if from_pos.x == to_pos.x:
+			start_pixel.y += 20
+			end_pixel.y -= 20
+		if from_pos.y == to_pos.y:
+			start_pixel.x += 20
+			end_pixel.x -= 20
+		
+		bridge.clear_points()
+		bridge.add_point(start_pixel)
+		bridge.add_point(end_pixel)
+
+		visual_bridges[path_key] = bridge
+	elif action == "upgrade":
+		if visual_bridges.has(path_key):
+			var bridge_node = visual_bridges[path_key]
+			bridge_node.set_double_bridge()
+	map_changed.emit(start_idx, current_map[start_idx])
 
 
 func draw_map(islands: Array):
@@ -152,7 +178,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				
 			if (
 				currently_selected
-				and new_cell_id == tile_type.UnselectedIsland
+				and (new_cell_id == tile_type.UnselectedIsland or new_cell_id == tile_type.SelectedIsland)
+				and mouse_pos != currently_selected_pos
 			):
 				can_be_selected = (
 					currently_selected_pos.x == mouse_pos.x
@@ -164,4 +191,3 @@ func _unhandled_input(event: InputEvent) -> void:
 					is_hovering = true
 			else:
 				currently_hovered_pos = Vector2i(-1, -1)
-			
