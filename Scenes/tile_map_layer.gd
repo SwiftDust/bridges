@@ -1,6 +1,6 @@
 extends TileMapLayer
 
-signal map_changed(new_value: PackedStringArray)
+signal map_changed()
 
 @export var label_scene: PackedScene
 @export var bridge_scene: PackedScene
@@ -39,6 +39,17 @@ func _coords_to_index(pos: Vector2i) -> int:
 
 func _get_path_key(idx1: int, idx2: int) -> String:
 	return str(min(idx1, idx2)) + "-" + str(max(idx1, idx2))
+
+
+func get_total_placed_bridges() -> int:
+	var total = 0
+	for path_key in visual_bridges:
+		var bridge_node = visual_bridges[path_key]
+		if bridge_node.width > 20:
+			total += 2
+		else:
+			total += 1
+	return total
 
 
 func is_first_island_in_direction(from_pos: Vector2i, to_pos: Vector2i):
@@ -120,7 +131,7 @@ func draw_bridges_in_direction(from_pos: Vector2i, to_pos: Vector2i):
 		if visual_bridges.has(path_key):
 			var bridge_node = visual_bridges[path_key]
 			bridge_node.set_double_bridge()
-	map_changed.emit(start_idx, current_map[start_idx])
+	map_changed.emit()
 
 
 func draw_map(islands: Array):
@@ -141,7 +152,7 @@ func draw_map(islands: Array):
 
 func _unhandled_input(event: InputEvent) -> void:
 	# TODO: Have a hovered version of tile, too, instead of instantly selecting
-	if event is InputEventMouseButton and event.pressed:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var mouse_pos = local_to_map(get_local_mouse_position())
 		is_unselected = get_cell_source_id(mouse_pos) == tile_type.UnselectedIsland
 		is_selected = get_cell_source_id(mouse_pos) == tile_type.SelectedIsland
@@ -155,6 +166,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			is_hovering = false
 			currently_selected = false
 			currently_hovered_pos = Vector2i(-1, -1)
+			get_viewport().set_input_as_handled()
 		elif is_unselected or is_selected:
 			if !currently_selected:
 				set_cell(mouse_pos, tile_type.SelectedIsland, Vector2i(0, 0), 0)
@@ -163,6 +175,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			elif currently_selected_pos == mouse_pos:
 				currently_selected = false
 				set_cell(mouse_pos, tile_type.UnselectedIsland, Vector2i(0, 0), 0)
+			get_viewport().set_input_as_handled()
 		
 	if event is InputEventMouseMotion:
 		var mouse_pos = local_to_map(get_local_mouse_position())
@@ -191,3 +204,4 @@ func _unhandled_input(event: InputEvent) -> void:
 					is_hovering = true
 			else:
 				currently_hovered_pos = Vector2i(-1, -1)
+				is_hovering = false

@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://d2ihs2wfxcov4"]
+
+[ext_resource type="FontFile" uid="uid://xkdscj3f4vgm" path="res://Fonts/GoogleSans-VariableFont_GRAD,opsz,wght.ttf" id="1_e0onf"]
+[ext_resource type="Script" uid="uid://cmc541hvhuv2q" path="res://Scenes/hud.gd" id="1_fccik"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0onf"]
+bg_color = Color(0.8117647, 0.7372549, 0.58431375, 1)
+corner_radius_bottom_right = 13
+
+[node name="HUD" type="CanvasLayer" unique_id=1888425840]
+script = ExtResource("1_fccik")
+
+[node name="Panel" type="Panel" parent="." unique_id=379830075]
+anchors_preset = -1
+anchor_top = -0.013888889
+anchor_right = 0.0390625
+anchor_bottom = -0.013888889
+offset_right = 197.0
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_e0onf")
+metadata/_edit_use_anchors_ = true
+
+[node name="Count" type="Label" parent="." unique_id=1341356220]
+offset_left = 10.0
+offset_top = -5.0
+offset_right = 60.0
+offset_bottom = 36.0
+theme_override_fonts/font = ExtResource("1_e0onf")
+theme_override_font_sizes/font_size = 32
+text = "00/00"
+metadata/_edit_use_anchors_ = true
+metadata/_edit_group_ = true
+
+[node name="BridgesPlaced" type="Label" parent="." unique_id=356581076]
+offset_left = 102.0
+offset_top = 8.0
+offset_right = 233.0
+offset_bottom = 31.0
+theme_override_fonts/font = ExtResource("1_e0onf")
+text = "BRIDGES PLACED"
+metadata/_edit_group_ = true

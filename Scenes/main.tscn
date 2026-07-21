@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bp6wddt6aound" path="res://Scenes/main.gd" id="1_d1ilt"]
 [ext_resource type="Texture2D" uid="uid://c2wnb58867sij" path="res://Sprites/Tilemap/Frame 1.png" id="1_ynf5e"]
+[ext_resource type="PackedScene" uid="uid://d2ihs2wfxcov4" path="res://Scenes/hud.tscn" id="2_344ge"]
 [ext_resource type="Texture2D" uid="uid://4xdplcyvo638" path="res://Sprites/Tilemap/Frame 2.png" id="2_hptm8"]
 [ext_resource type="Texture2D" uid="uid://bvbij6vh0y0qe" path="res://Sprites/Tilemap/Frame 9.png" id="9_h1bgf"]
 [ext_resource type="Script" uid="uid://d3wq3omhnavt" path="res://Scenes/tile_map_layer.gd" id="10_hptm8"]
@@ -32,6 +33,8 @@ sources/8 = SubResource("TileSetAtlasSource_cbgmd")
 [node name="Main" type="Node2D" unique_id=1729672017]
 script = ExtResource("1_d1ilt")
 
+[node name="HUD" parent="." unique_id=433679130 instance=ExtResource("2_344ge")]
+
 [node name="Camera2D" type="Camera2D" parent="." unique_id=719402813]
 enabled = false
 
@@ -41,3 +44,5 @@ rendering_quadrant_size = 128
 script = ExtResource("10_hptm8")
 label_scene = ExtResource("12_6iyac")
 bridge_scene = ExtResource("19_fevyy")
+
+[connection signal="map_changed" from="TileMapLayer" to="." method="_on_tile_map_layer_map_changed"]
