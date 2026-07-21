@@ -60,15 +60,13 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if current_map == solution_arr:
-		pass # you win!
+		get_tree().change_scene_to_file("res://Scenes/win_screen.tscn")
 
 
 func _on_tile_map_layer_map_changed() -> void:
 	current_map = tile_map.current_map
 	var count = tile_map.get_total_placed_bridges()
-	var total = 0
-	
-	for bridge in solution_arr:
-		total += _find_bridge_count(int(bridge))
+	## TODO: write an algorithm to figure out the total
+	var total = 19 # hardcoded for now because there is one single puzzle
 	
 	hud.set_bridges_placed(count, total)

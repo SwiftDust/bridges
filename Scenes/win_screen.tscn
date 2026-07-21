@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://cani8eymybt2t"]
+
+[ext_resource type="FontFile" uid="uid://xkdscj3f4vgm" path="res://Fonts/GoogleSans-VariableFont_GRAD,opsz,wght.ttf" id="1_l5sol"]
+[ext_resource type="Script" uid="uid://cjrvruoffahnj" path="res://Scenes/button.gd" id="2_a00f1"]
+
+[node name="WinScreen" type="Control" unique_id=315927661]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1199252432]
+layout_mode = 0
+offset_right = 1148.0
+offset_bottom = 653.0
+color = Color(0.31764707, 0.40392157, 0.3529412, 1)
+
+[node name="Label2" type="Label" parent="." unique_id=1056633439]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -125.0
+offset_top = -80.0
+offset_right = 125.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("1_l5sol")
+theme_override_font_sizes/font_size = 64
+text = "you win!!"
+
+[node name="Label" type="Label" parent="." unique_id=344021976]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -257.5
+offset_top = 3.5
+offset_right = 257.5
+offset_bottom = 88.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("1_l5sol")
+theme_override_font_sizes/font_size = 32
+text = "there's just one level as of right now,
+but thanks for playing :)"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="." unique_id=235592963]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -34.0
+offset_top = 101.0
+offset_right = 34.0
+offset_bottom = 132.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("1_l5sol")
+text = "go back"
+script = ExtResource("2_a00f1")
+
+[connection signal="pressed" from="Button" to="Button" method="_on_pressed"]

@@ -166,7 +166,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			is_hovering = false
 			currently_selected = false
 			currently_hovered_pos = Vector2i(-1, -1)
-			get_viewport().set_input_as_handled()
+			#get_viewport().set_input_as_handled()
 		elif is_unselected or is_selected:
 			if !currently_selected:
 				set_cell(mouse_pos, tile_type.SelectedIsland, Vector2i(0, 0), 0)
@@ -175,7 +175,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			elif currently_selected_pos == mouse_pos:
 				currently_selected = false
 				set_cell(mouse_pos, tile_type.UnselectedIsland, Vector2i(0, 0), 0)
-			get_viewport().set_input_as_handled()
+			#get_viewport().set_input_as_handled()
 		
 	if event is InputEventMouseMotion:
 		var mouse_pos = local_to_map(get_local_mouse_position())
