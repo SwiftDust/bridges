@@ -4,7 +4,6 @@
 [ext_resource type="Texture2D" uid="uid://c2wnb58867sij" path="res://Sprites/Tilemap/Frame 1.png" id="1_ynf5e"]
 [ext_resource type="PackedScene" uid="uid://d2ihs2wfxcov4" path="res://Scenes/hud.tscn" id="2_344ge"]
 [ext_resource type="Texture2D" uid="uid://4xdplcyvo638" path="res://Sprites/Tilemap/Frame 2.png" id="2_hptm8"]
-[ext_resource type="PackedScene" uid="uid://cani8eymybt2t" path="res://Scenes/win_screen.tscn" id="2_ynf5e"]
 [ext_resource type="Texture2D" uid="uid://bvbij6vh0y0qe" path="res://Sprites/Tilemap/Frame 9.png" id="9_h1bgf"]
 [ext_resource type="Script" uid="uid://d3wq3omhnavt" path="res://Scenes/tile_map_layer.gd" id="10_hptm8"]
 [ext_resource type="PackedScene" uid="uid://da8p6lroo2w41" path="res://Scenes/island_label.tscn" id="12_6iyac"]
@@ -33,7 +32,6 @@ sources/8 = SubResource("TileSetAtlasSource_cbgmd")
 
 [node name="Main" type="Node2D" unique_id=1729672017]
 script = ExtResource("1_d1ilt")
-win_screen = ExtResource("2_ynf5e")
 
 [node name="HUD" parent="." unique_id=433679130 instance=ExtResource("2_344ge")]
 

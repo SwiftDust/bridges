@@ -114,13 +114,10 @@ func draw_bridges_in_direction(from_pos: Vector2i, to_pos: Vector2i):
 		
 		var start_pixel = map_to_local(from_pos)
 		var end_pixel = map_to_local(to_pos)
+		var dir_vector = Vector2(direction).normalized()
 		
-		if from_pos.x == to_pos.x:
-			start_pixel.y += 20
-			end_pixel.y -= 20
-		if from_pos.y == to_pos.y:
-			start_pixel.x += 20
-			end_pixel.x -= 20
+		start_pixel += dir_vector * 15.0
+		end_pixel -= dir_vector * 15.0
 		
 		bridge.clear_points()
 		bridge.add_point(start_pixel)
